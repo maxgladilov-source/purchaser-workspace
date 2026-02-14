@@ -163,10 +163,11 @@ export default function DashboardLayout({
       <App>
         <ProLayout
           title={"Рабочее пространство для закупок"}
-          logo={dark ? "/zakazhi-logo-dark.svg" : "/zakazhi-logo.png"}
+          logo={false}
           headerTitleRender={() => (
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <img
+                className="header-logo"
                 src={dark ? "/zakazhi-logo-dark.svg" : "/zakazhi-logo.png"}
                 alt="Logo"
                 style={{ height: 32, width: "auto", flexShrink: 0 }}

@@ -118,6 +118,13 @@ body {
   }
 }
 
+/* Hide header logo on very narrow screens */
+@media (max-width: 1000px) {
+  .header-logo {
+    display: none;
+  }
+}
+
 /* Disable hover effect on non-interactive ProLayout header actions */
 .ant-pro-global-header-header-actions-item:has(.header-info) {
   cursor: default;
