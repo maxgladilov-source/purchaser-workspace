@@ -289,7 +289,7 @@ export default function NewOrderPage() {
             onChange={(v) => updateField("dimensionLength", v)}
             min={0}
             style={{ flex: 1 }}
-            addonAfter="мм"
+            suffix="мм"
           />
           <InputNumber
             placeholder="Ширина"
@@ -297,7 +297,7 @@ export default function NewOrderPage() {
             onChange={(v) => updateField("dimensionWidth", v)}
             min={0}
             style={{ flex: 1 }}
-            addonAfter="мм"
+            suffix="мм"
           />
           <InputNumber
             placeholder="Высота"
@@ -305,7 +305,7 @@ export default function NewOrderPage() {
             onChange={(v) => updateField("dimensionHeight", v)}
             min={0}
             style={{ flex: 1 }}
-            addonAfter="мм"
+            suffix="мм"
           />
         </div>
       </Form.Item>
@@ -317,7 +317,7 @@ export default function NewOrderPage() {
           onChange={(v) => updateField("weight", v)}
           min={0}
           style={{ width: "100%" }}
-          addonAfter="кг"
+          suffix="кг"
         />
       </Form.Item>
 
@@ -363,7 +363,7 @@ export default function NewOrderPage() {
           onChange={(v) => updateField("budget", v)}
           min={0}
           style={{ width: "100%" }}
-          addonAfter="\u20BD"
+          suffix="\u20BD"
           formatter={(value) =>
             value
               ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, " ")
@@ -392,7 +392,7 @@ export default function NewOrderPage() {
           onChange={(v) => updateField("deliveryDays", v)}
           min={1}
           style={{ width: "100%" }}
-          addonAfter="дней"
+          suffix="дней"
         />
       </Form.Item>
     </Form>

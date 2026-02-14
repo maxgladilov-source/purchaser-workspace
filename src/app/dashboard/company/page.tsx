@@ -17,7 +17,7 @@ import {
   Space,
   Popconfirm,
   Avatar,
-  message,
+  App,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import {
@@ -39,6 +39,9 @@ import {
   SendOutlined,
   IdcardOutlined,
   AuditOutlined,
+  UserAddOutlined,
+  FileSearchOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 
 const { Text, Title } = Typography;
@@ -93,6 +96,7 @@ const companyProfile = {
     email: "petrova@technoprom.ru",
     telegram: "@petrova_mi",
   },
+  verificationLevel: 2, // 0=Новый, 1=На проверке, 2=Верифицированный, 3=Надёжный покупатель
   registeredAt: "2025-04-15",
   certifications: [
     { name: "ISO 9001:2015", issuer: "TUV Rheinland", issued: "2023-01-20", expires: "2026-01-19", status: "active" as const },
@@ -165,10 +169,39 @@ const roleConfig: Record<Role, { label: string; color: string }> = {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Verification Steps                                                 */
+/* ------------------------------------------------------------------ */
+
+const verificationLevels = [
+  { label: "Новый", icon: <UserAddOutlined />, color: "default" },
+  { label: "На проверке", icon: <FileSearchOutlined />, color: "processing" },
+  { label: "Верифицированный", icon: <SafetyCertificateOutlined />, color: "gold" },
+  { label: "Надёжный покупатель", icon: <StarOutlined />, color: "green" },
+];
+
+function VerificationSteps({ level }: { level: number }) {
+  return (
+    <Space size={4} wrap>
+      {verificationLevels.map((step, i) => (
+        <Tag
+          key={step.label}
+          icon={step.icon}
+          color={i <= level ? step.color : undefined}
+          style={i > level ? { opacity: 0.35 } : undefined}
+        >
+          {step.label}
+        </Tag>
+      ))}
+    </Space>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
 
 export default function CompanyPage() {
+  const { message } = App.useApp();
   const [users, setUsers] = useState<CompanyUser[]>(initialUsers);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | Role>("all");
@@ -407,9 +440,12 @@ export default function CompanyPage() {
               </span>
             )}
           </div>
-          <div style={{ flex: 1, minWidth: 200 }}>
+          <div style={{ minWidth: 200 }}>
             <Title level={4} style={{ margin: 0 }}>{companyProfile.name}</Title>
             <Text type="secondary" style={{ fontSize: 13 }}>{companyProfile.legalName}</Text>
+          </div>
+          <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", minWidth: 300 }}>
+            <VerificationSteps level={companyProfile.verificationLevel} />
           </div>
         </div>
 
