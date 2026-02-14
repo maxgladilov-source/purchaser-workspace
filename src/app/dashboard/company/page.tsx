@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { usePermissions } from "@/contexts/RoleContext";
+import { getCertificationStatus } from "@/lib/data-schema";
 import { PageContainer } from "@ant-design/pro-components";
 import {
   Card,
@@ -100,9 +101,10 @@ const companyProfile = {
   verificationLevel: 2, // 0=Новый, 1=На проверке, 2=Верифицированный, 3=Надёжный покупатель
   registeredAt: "2025-04-15",
   certifications: [
-    { name: "ISO 9001:2015", issuer: "TUV Rheinland", issued: "2023-01-20", expires: "2026-01-19", status: "active" as const },
-    { name: "ISO 14001:2015", issuer: "SGS", issued: "2023-06-10", expires: "2026-06-09", status: "active" as const },
-    { name: "ГОСТ Р ИСО 9001-2015", issuer: "Ростест", issued: "2022-09-01", expires: "2025-08-31", status: "expiring" as const },
+    { name: "ISO 9001:2015", issuer: "TUV Rheinland", issued: "2023-01-20", expires: "2026-01-19", verified: true },
+    { name: "ISO 14001:2015", issuer: "SGS", issued: "2023-06-10", expires: "2026-06-09", verified: true },
+    { name: "ГОСТ Р ИСО 9001-2015", issuer: "Ростест", issued: "2022-09-01", expires: "2025-08-31", verified: true },
+    { name: "ISO 45001:2018", issuer: "Bureau Veritas", issued: "2025-12-01", expires: "2028-11-30", verified: false },
   ],
 };
 
@@ -620,9 +622,18 @@ export default function CompanyPage() {
           gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
           gap: 12,
         }}>
-          {companyProfile.certifications.map((cert) => {
-            const isExpiring = cert.status === "expiring";
-            const borderColor = isExpiring ? "#faad14" : (dark ? "#333" : "#f0f0f0");
+          {companyProfile.certifications.filter((cert) => {
+            const exp = new Date(cert.expires);
+            const monthsAgo = (Date.now() - exp.getTime()) / (1000 * 60 * 60 * 24 * 30);
+            return monthsAgo <= 3;
+          }).map((cert) => {
+            const certStatus = getCertificationStatus(cert);
+            const isNormal = certStatus === "active";
+            const borderColor = isNormal
+              ? (dark ? "#333" : "#f0f0f0")
+              : certStatus === "expired" ? "#ff4d4f"
+              : certStatus === "pending_review" ? "#1677ff"
+              : "#faad14";
             return (
               <div
                 key={cert.name}
@@ -630,18 +641,28 @@ export default function CompanyPage() {
                   border: `1px solid ${borderColor}`,
                   borderRadius: 8,
                   padding: "12px 16px",
-                  background: isExpiring
-                    ? (dark ? "rgba(250,173,20,0.08)" : "rgba(250,173,20,0.04)")
-                    : (dark ? "#1f1f1f" : "#fafafa"),
+                  background: isNormal
+                    ? (dark ? "#1f1f1f" : "#fafafa")
+                    : certStatus === "pending_review"
+                    ? (dark ? "rgba(22,119,255,0.08)" : "rgba(22,119,255,0.04)")
+                    : (dark ? "rgba(250,173,20,0.08)" : "rgba(250,173,20,0.04)"),
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                   <Text strong style={{ fontSize: 14 }}>{cert.name}</Text>
                   <Tag
-                    color={isExpiring ? "warning" : "success"}
+                    color={
+                      certStatus === "pending_review" ? "processing"
+                      : certStatus === "expired" ? "error"
+                      : certStatus === "expiring" ? "warning"
+                      : "success"
+                    }
                     style={{ marginRight: 0 }}
                   >
-                    {isExpiring ? "Истекает" : "Активен"}
+                    {certStatus === "pending_review" ? "На проверке"
+                      : certStatus === "expired" ? "Просрочен"
+                      : certStatus === "expiring" ? "Истекает"
+                      : "Активен"}
                   </Tag>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -649,7 +670,7 @@ export default function CompanyPage() {
                     Выдан: <Text style={{ fontSize: 12 }}>{cert.issuer}</Text>
                   </Text>
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    Действует: {cert.issued} \u2014 {cert.expires}
+                    Действует: {new Date(cert.issued).toLocaleDateString("ru-RU")} - {new Date(cert.expires).toLocaleDateString("ru-RU")}
                   </Text>
                 </div>
               </div>
