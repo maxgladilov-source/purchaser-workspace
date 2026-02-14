@@ -111,6 +111,13 @@ body {
   animation: word-rotate-in 2.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Hide header title text on narrow screens */
+@media (max-width: 1500px) {
+  .header-title-text {
+    display: none;
+  }
+}
+
 /* Disable hover effect on non-interactive ProLayout header actions */
 .ant-pro-global-header-header-actions-item:has(.header-info) {
   cursor: default;

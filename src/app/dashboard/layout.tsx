@@ -38,7 +38,7 @@ function HeaderClock() {
   }, []);
   if (!now) return null;
   return (
-    <span className="header-info" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, opacity: 0.7, fontVariantNumeric: "tabular-nums" }}>
+    <span className="header-info" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, opacity: 0.7, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
       <ClockCircleOutlined />
       {now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
       <span style={{ opacity: 0.4 }}>|</span>
@@ -149,7 +149,7 @@ export default function DashboardLayout({
 
   return (
     <>
-    <SplashScreen />
+    {/* <SplashScreen /> */}
     <ConfigProvider
       locale={ruRU}
       theme={{
@@ -164,10 +164,14 @@ export default function DashboardLayout({
         <ProLayout
           title={"Рабочее пространство для закупок"}
           logo={dark ? "/zakazhi-logo-dark.svg" : "/zakazhi-logo.png"}
-          headerTitleRender={(logo) => (
-            <div style={{ display: "flex", alignItems: "center", gap: 60 }}>
-              <div style={{ transform: "scale(1.2)", transformOrigin: "left center" }}>{logo}</div>
-              <span style={{ fontSize: 32, fontWeight: 600, position: "relative", top: -5 }}>Рабочее пространство для закупок</span>
+          headerTitleRender={() => (
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <img
+                src={dark ? "/zakazhi-logo-dark.svg" : "/zakazhi-logo.png"}
+                alt="Logo"
+                style={{ height: 32, width: "auto", flexShrink: 0 }}
+              />
+              <span className="header-title-text" style={{ fontSize: 28, fontWeight: 600, whiteSpace: "nowrap" }}>Рабочее пространство для закупок</span>
             </div>
           )}
           layout="mix"
@@ -191,7 +195,7 @@ export default function DashboardLayout({
             </a>
           )}
           actionsRender={() => [
-            <span key="connection" className="header-info" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14 }}>
+            <span key="connection" className="header-info" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, whiteSpace: "nowrap" }}>
               <span style={{
                 width: 8,
                 height: 8,
