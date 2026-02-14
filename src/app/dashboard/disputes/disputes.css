@@ -1,0 +1,117 @@
+/* Dispute list scrollbar */
+.dispute-list {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d4 transparent;
+}
+
+.dispute-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dispute-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dispute-list::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 3px;
+}
+
+.dispute-list::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}
+
+/* Dispute card */
+.dispute-card {
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dispute-card:hover {
+  border-color: #4096ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.12);
+}
+
+.dispute-card-selected,
+.dispute-card-selected:hover {
+  border-color: #f5222d;
+  box-shadow: 0 0 0 2px rgba(245, 34, 45, 0.18);
+  background-color: #f0f0f0 !important;
+}
+
+.dispute-card-selected .ant-card-body,
+.dispute-card-selected:hover .ant-card-body {
+  background-color: #f0f0f0 !important;
+}
+
+/* Message thread scrollbar */
+.dispute-messages {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d4 transparent;
+}
+
+.dispute-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dispute-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dispute-messages::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 3px;
+}
+
+.dispute-messages::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}
+
+/* Dark theme */
+.dark .dispute-list {
+  scrollbar-color: #555 transparent;
+}
+
+.dark .dispute-list::-webkit-scrollbar-thumb {
+  background: #555;
+}
+
+.dark .dispute-list::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+.dark .dispute-card {
+  border-color: #444;
+}
+
+.dark .dispute-card:hover {
+  border-color: #4096ff;
+  box-shadow: 0 0 0 2px rgba(64, 150, 255, 0.25);
+}
+
+.dark .dispute-card-selected,
+.dark .dispute-card-selected:hover {
+  border-color: #f5222d;
+  box-shadow: 0 0 0 2px rgba(245, 34, 45, 0.3);
+  background-color: #2a2a2a !important;
+}
+
+.dark .dispute-card-selected .ant-card-body,
+.dark .dispute-card-selected:hover .ant-card-body {
+  background-color: #2a2a2a !important;
+}
+
+.dark .dispute-messages {
+  scrollbar-color: #555 transparent;
+}
+
+.dark .dispute-messages::-webkit-scrollbar-thumb {
+  background: #555;
+}
+
+.dark .dispute-messages::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
