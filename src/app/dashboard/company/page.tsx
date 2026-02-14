@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { usePermissions } from "@/contexts/RoleContext";
 import { PageContainer } from "@ant-design/pro-components";
 import {
   Card,
@@ -173,7 +174,7 @@ const roleConfig: Record<Role, { label: string; color: string }> = {
 /* ------------------------------------------------------------------ */
 
 const verificationLevels = [
-  { label: "Новый", icon: <UserAddOutlined />, color: "default" },
+  { label: "Новый", icon: <UserAddOutlined />, color: "green" },
   { label: "На проверке", icon: <FileSearchOutlined />, color: "processing" },
   { label: "Верифицированный", icon: <SafetyCertificateOutlined />, color: "gold" },
   { label: "Надёжный покупатель", icon: <StarOutlined />, color: "green" },
@@ -201,6 +202,7 @@ function VerificationSteps({ level }: { level: number }) {
 /* ------------------------------------------------------------------ */
 
 export default function CompanyPage() {
+  const { can } = usePermissions();
   const { message } = App.useApp();
   const [users, setUsers] = useState<CompanyUser[]>(initialUsers);
   const [search, setSearch] = useState("");
@@ -334,18 +336,6 @@ export default function CompanyPage() {
       render: (role: Role) => (
         <Tag color={roleConfig[role].color}>{roleConfig[role].label}</Tag>
       ),
-    },
-    {
-      title: "Telegram",
-      dataIndex: "telegram",
-      key: "telegram",
-      width: 140,
-      render: (val: string) =>
-        val ? (
-          <Text style={{ fontSize: 12 }}><SendOutlined style={{ color: "#229ED9", marginRight: 4 }} />{val}</Text>
-        ) : (
-          <Text type="secondary" style={{ fontSize: 12 }}>\u2014</Text>
-        ),
     },
     {
       title: "Статус",
@@ -566,18 +556,23 @@ export default function CompanyPage() {
             <Text strong style={{ fontSize: 13 }}>{companyProfile.representative.name}</Text>
             <Text type="secondary" style={{ fontSize: 12 }}> · {companyProfile.representative.title}</Text>
           </div>
-          <div style={{ width: 1, height: 24, background: dark ? "#333" : "#e0e0e0", flexShrink: 0 }} />
-          <Text style={{ fontSize: 12 }}><PhoneOutlined style={{ color: "#1677ff", marginRight: 4 }} />{companyProfile.representative.phone}</Text>
-          <Text style={{ fontSize: 12 }}><MailOutlined style={{ color: "#1677ff", marginRight: 4 }} />{companyProfile.representative.email}</Text>
-          <Text style={{ fontSize: 12 }}><SendOutlined style={{ color: "#229ED9", marginRight: 4 }} />{companyProfile.representative.telegram}</Text>
+          {can("editCompany") && (
+            <>
+              <div style={{ width: 1, height: 24, background: dark ? "#333" : "#e0e0e0", flexShrink: 0 }} />
+              <Text style={{ fontSize: 12 }}><PhoneOutlined style={{ color: "#1677ff", marginRight: 4 }} />{companyProfile.representative.phone}</Text>
+              <Text style={{ fontSize: 12 }}><MailOutlined style={{ color: "#1677ff", marginRight: 4 }} />{companyProfile.representative.email}</Text>
+            </>
+          )}
           <div style={{ flex: 1 }} />
-          <Button
-            size="small"
-            icon={<PhoneOutlined />}
-            href={`mailto:info@everypart.pro?subject=Запрос на изменение профиля компании — ${companyProfile.id}`}
-          >
-            Запросить изменения через поддержку
-          </Button>
+          {can("editCompany") && (
+            <Button
+              size="small"
+              icon={<PhoneOutlined />}
+              href={`mailto:info@everypart.pro?subject=Запрос на изменение профиля компании — ${companyProfile.id}`}
+            >
+              Запросить изменения через поддержку
+            </Button>
+          )}
         </div>
 
         {/* Admin — nested card */}
@@ -601,7 +596,6 @@ export default function CompanyPage() {
           <div style={{ width: 1, height: 24, background: dark ? "#333" : "#e0e0e0", flexShrink: 0 }} />
           <Text style={{ fontSize: 12 }}><PhoneOutlined style={{ color: "#1677ff", marginRight: 4 }} />{companyProfile.admin.phone}</Text>
           <Text style={{ fontSize: 12 }}><MailOutlined style={{ color: "#1677ff", marginRight: 4 }} />{companyProfile.admin.email}</Text>
-          <Text style={{ fontSize: 12 }}><SendOutlined style={{ color: "#229ED9", marginRight: 4 }} />{companyProfile.admin.telegram}</Text>
         </div>
 
       </Card>
@@ -614,6 +608,12 @@ export default function CompanyPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
           <SafetyCertificateOutlined style={{ fontSize: 18, color: "#fa8c16" }} />
           <Title level={5} style={{ margin: 0 }}>Сертификации</Title>
+          <div style={{ flex: 1 }} />
+          {can("editCompany") && (
+            <Button size="small" type="primary" icon={<PlusOutlined />}>
+              Добавить
+            </Button>
+          )}
         </div>
         <div style={{
           display: "grid",
@@ -659,149 +659,153 @@ export default function CompanyPage() {
       </Card>
 
       {/* ================================================================ */}
-      {/*  User Access Management                                           */}
+      {/*  User Access Management (admin only)                               */}
       {/* ================================================================ */}
 
-      <div style={{ marginBottom: 12, marginTop: 24 }}>
-        <Title level={5} style={{ margin: 0 }}>Управление доступом</Title>
-        <Text type="secondary" style={{ fontSize: 13 }}>Управление пользователями и их ролями в системе закупок</Text>
-      </div>
+      {can("manageUsers") && (
+        <>
+          <div style={{ marginBottom: 12, marginTop: 24 }}>
+            <Title level={5} style={{ margin: 0 }}>Управление доступом</Title>
+            <Text type="secondary" style={{ fontSize: 13 }}>Управление пользователями и их ролями в системе закупок</Text>
+          </div>
 
-      {/* Stats */}
-      <Card style={{ borderRadius: 8, marginBottom: 16 }}>
-        <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
-          <Statistic
-            title="Всего пользователей"
-            value={`${totalActive}/${users.length}`}
-            prefix={<TeamOutlined style={{ color: "#1677ff" }} />}
-            valueStyle={{ fontSize: 22 }}
-          />
-          <Statistic
-            title="Закупщики"
-            value={purchaserCount}
-            prefix={<UserOutlined style={{ color: "#1677ff" }} />}
-            valueStyle={{ fontSize: 22, color: "#1677ff" }}
-          />
-          <Statistic
-            title="Инженеры"
-            value={engineerCount}
-            prefix={<UserOutlined style={{ color: "#fa8c16" }} />}
-            valueStyle={{ fontSize: 22, color: "#fa8c16" }}
-          />
-          <Statistic
-            title="Руководители проектов"
-            value={pmCount}
-            prefix={<UserOutlined style={{ color: "#52c41a" }} />}
-            valueStyle={{ fontSize: 22, color: "#52c41a" }}
-          />
-        </div>
-      </Card>
+          {/* Stats */}
+          <Card style={{ borderRadius: 8, marginBottom: 16 }}>
+            <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+              <Statistic
+                title="Всего пользователей"
+                value={`${totalActive}/${users.length}`}
+                prefix={<TeamOutlined style={{ color: "#1677ff" }} />}
+                valueStyle={{ fontSize: 22 }}
+              />
+              <Statistic
+                title="Закупщики"
+                value={purchaserCount}
+                prefix={<UserOutlined style={{ color: "#1677ff" }} />}
+                valueStyle={{ fontSize: 22, color: "#1677ff" }}
+              />
+              <Statistic
+                title="Инженеры"
+                value={engineerCount}
+                prefix={<UserOutlined style={{ color: "#fa8c16" }} />}
+                valueStyle={{ fontSize: 22, color: "#fa8c16" }}
+              />
+              <Statistic
+                title="Руководители проектов"
+                value={pmCount}
+                prefix={<UserOutlined style={{ color: "#52c41a" }} />}
+                valueStyle={{ fontSize: 22, color: "#52c41a" }}
+              />
+            </div>
+          </Card>
 
-      {/* Filters + Add */}
-      <Card size="small" style={{ borderRadius: 8, marginBottom: 16 }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <Input
-            placeholder="Поиск по имени или email..."
-            prefix={<SearchOutlined />}
-            allowClear
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ width: 260 }}
-          />
-          <Select
-            value={roleFilter}
-            onChange={setRoleFilter}
-            style={{ width: 200 }}
-            options={[
-              { value: "all", label: "Все роли" },
-              { value: "purchaser", label: "Закупщик" },
-              { value: "engineer", label: "Инженер-конструктор" },
-              { value: "project_manager", label: "Руководитель проектов" },
-            ]}
-          />
-          <Select
-            value={statusFilter}
-            onChange={setStatusFilter}
-            style={{ width: 140 }}
-            options={[
-              { value: "all", label: "Все статусы" },
-              { value: "active", label: "Активные" },
-              { value: "inactive", label: "Неактивные" },
-            ]}
-          />
-          <div style={{ flex: 1 }} />
-          <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal}>
-            Добавить
-          </Button>
-        </div>
-      </Card>
+          {/* Filters + Add */}
+          <Card size="small" style={{ borderRadius: 8, marginBottom: 16 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Input
+                placeholder="Поиск по имени или email..."
+                prefix={<SearchOutlined />}
+                allowClear
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ width: 260 }}
+              />
+              <Select
+                value={roleFilter}
+                onChange={setRoleFilter}
+                style={{ width: 200 }}
+                options={[
+                  { value: "all", label: "Все роли" },
+                  { value: "purchaser", label: "Закупщик" },
+                  { value: "engineer", label: "Инженер-конструктор" },
+                  { value: "project_manager", label: "Руководитель проектов" },
+                ]}
+              />
+              <Select
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: 140 }}
+                options={[
+                  { value: "all", label: "Все статусы" },
+                  { value: "active", label: "Активные" },
+                  { value: "inactive", label: "Неактивные" },
+                ]}
+              />
+              <div style={{ flex: 1 }} />
+              <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal}>
+                Добавить
+              </Button>
+            </div>
+          </Card>
 
-      {/* Table */}
-      <Card style={{ borderRadius: 8 }}>
-        <Table
-          dataSource={filtered}
-          columns={columns}
-          rowKey="id"
-          pagination={false}
-          size="middle"
-          locale={{ emptyText: "Нет пользователей, соответствующих фильтрам" }}
-        />
-      </Card>
-
-      {/* Add / Edit Modal */}
-      <Modal
-        title={editingUser ? "Редактировать пользователя" : "Добавить пользователя"}
-        open={modalOpen}
-        onOk={handleModalOk}
-        onCancel={() => setModalOpen(false)}
-        okText={editingUser ? "Сохранить" : "Добавить"}
-        cancelText="Отмена"
-        width={460}
-        destroyOnHidden
-        styles={{
-          content: dark ? { backgroundColor: "#383838" } : undefined,
-          header: dark ? { backgroundColor: "#383838" } : undefined,
-        }}
-      >
-        <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item
-            name="name"
-            label="ФИО"
-            rules={[{ required: true, message: "Введите имя пользователя" }]}
-          >
-            <Input prefix={<UserOutlined />} placeholder="Например, Иванов Алексей Сергеевич" />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Введите email" },
-              { type: "email", message: "Введите корректный email" },
-            ]}
-          >
-            <Input prefix={<MailOutlined />} placeholder="user@company.ru" />
-          </Form.Item>
-          <Form.Item name="telegram" label="Telegram">
-            <Input prefix={<SendOutlined style={{ color: "#229ED9" }} />} placeholder="Например, @ivanov_as" />
-          </Form.Item>
-          <Form.Item
-            name="role"
-            label="Роль"
-            rules={[{ required: true, message: "Выберите роль" }]}
-          >
-            <Select
-              options={[
-                { value: "purchaser", label: "Закупщик" },
-                { value: "engineer", label: "Инженер-конструктор" },
-                { value: "project_manager", label: "Руководитель проектов" },
-              ]}
+          {/* Table */}
+          <Card style={{ borderRadius: 8 }}>
+            <Table
+              dataSource={filtered}
+              columns={columns}
+              rowKey="id"
+              pagination={false}
+              size="middle"
+              locale={{ emptyText: "Нет пользователей, соответствующих фильтрам" }}
             />
-          </Form.Item>
-          <Form.Item name="active" label="Активен" valuePropName="checked">
-            <Switch checkedChildren="Актив." unCheckedChildren="Откл." />
-          </Form.Item>
-        </Form>
-      </Modal>
+          </Card>
+
+          {/* Add / Edit Modal */}
+          <Modal
+            title={editingUser ? "Редактировать пользователя" : "Добавить пользователя"}
+            open={modalOpen}
+            onOk={handleModalOk}
+            onCancel={() => setModalOpen(false)}
+            okText={editingUser ? "Сохранить" : "Добавить"}
+            cancelText="Отмена"
+            width={460}
+            destroyOnHidden
+            styles={{
+              content: dark ? { backgroundColor: "#383838" } : undefined,
+              header: dark ? { backgroundColor: "#383838" } : undefined,
+            }}
+          >
+            <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
+              <Form.Item
+                name="name"
+                label="ФИО"
+                rules={[{ required: true, message: "Введите имя пользователя" }]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="Например, Иванов Алексей Сергеевич" />
+              </Form.Item>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  { required: true, message: "Введите email" },
+                  { type: "email", message: "Введите корректный email" },
+                ]}
+              >
+                <Input prefix={<MailOutlined />} placeholder="user@company.ru" />
+              </Form.Item>
+              <Form.Item name="telegram" label="Telegram">
+                <Input prefix={<SendOutlined style={{ color: "#229ED9" }} />} placeholder="Например, @ivanov_as" />
+              </Form.Item>
+              <Form.Item
+                name="role"
+                label="Роль"
+                rules={[{ required: true, message: "Выберите роль" }]}
+              >
+                <Select
+                  options={[
+                    { value: "purchaser", label: "Закупщик" },
+                    { value: "engineer", label: "Инженер-конструктор" },
+                    { value: "project_manager", label: "Руководитель проектов" },
+                  ]}
+                />
+              </Form.Item>
+              <Form.Item name="active" label="Активен" valuePropName="checked">
+                <Switch checkedChildren="Актив." unCheckedChildren="Откл." />
+              </Form.Item>
+            </Form>
+          </Modal>
+        </>
+      )}
     </PageContainer>
   );
 }

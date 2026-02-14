@@ -27,6 +27,7 @@ import {
 } from "@ant-design/icons";
 import ruRU from "antd/locale/ru_RU";
 import SplashScreen from "@/components/SplashScreen";
+import { RoleProvider } from "@/contexts/RoleContext";
 
 function HeaderClock() {
   const [now, setNow] = useState<Date | null>(null);
@@ -287,7 +288,9 @@ export default function DashboardLayout({
             },
           }}
         >
-          {children}
+          <RoleProvider role={demoRole}>
+            {children}
+          </RoleProvider>
           <Modal
             title="Выход"
             open={signOutOpen}
