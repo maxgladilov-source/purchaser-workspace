@@ -21,7 +21,6 @@ import {
   LogoutOutlined,
   SunOutlined,
   MoonOutlined,
-  ExperimentOutlined,
   AuditOutlined,
   SafetyCertificateOutlined,
   ClockCircleOutlined,
@@ -59,6 +58,7 @@ export default function DashboardLayout({
   const [mounted, setMounted] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  const [demoRole, setDemoRole] = useState<"admin" | "user">("admin");
 
   useEffect(() => {
     setMounted(true);
@@ -205,12 +205,40 @@ export default function DashboardLayout({
                 display: "inline-block",
                 animation: "pulse-dot 1.5s ease-in-out infinite",
               }} />
-              <span style={{ color: "#52c41a", fontWeight: 500 }}>Подключено</span>
+              <span style={{ color: "#52c41a", fontWeight: 500 }}>Демо</span>
+            </span>,
+            <span key="demo-role" style={{ display: "inline-flex", alignItems: "center", gap: 2, fontSize: 14 }}>
+              <button
+                onClick={() => setDemoRole("admin")}
+                style={{
+                  padding: 0,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  border: "none",
+                  background: "none",
+                  color: demoRole === "admin" ? "#1677ff" : (dark ? "#555" : "#bbb"),
+                }}
+              >
+                Admin
+              </button>
+              <span style={{ color: dark ? "#555" : "#bbb" }}>/</span>
+              <button
+                onClick={() => setDemoRole("user")}
+                style={{
+                  padding: 0,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  border: "none",
+                  background: "none",
+                  color: demoRole === "user" ? "#1677ff" : (dark ? "#555" : "#bbb"),
+                }}
+              >
+                User
+              </button>
             </span>,
             <HeaderClock key="clock" />,
-            <Tag key="demo" icon={<ExperimentOutlined />} color="green">
-              Демо-режим
-            </Tag>,
             <Tag key="level" icon={<SafetyCertificateOutlined />} color="gold">
               Верифицированный покупатель
             </Tag>,
